@@ -29,22 +29,19 @@ const SendOtpPage = () => {
     if (!isEmailValid(userData.email)) {
       toast.error("Please error correct email");
     }
-  
+
     const response = await dispatch(sendOtp(userData));
-    console.log(response);
-    // // if (response?.payload?.success) {
-    //   const userEmail = response.meta.arg.email;
-    //   setTimeout(() => {
-    //     navigate("/verify/otp", {
-    //       state: {
-    //         userEmail,
-    //       },
-    //     });
-    //     setUserData({
-    //       email: "",
-    //     });
-    //   }, 5000);
-    // }
+    if (response?.payload?.success) {
+      const userEmail = response.meta.arg.email;
+      navigate("/verify/otp", {
+        state: {
+          userEmail,
+        },
+      });
+      setUserData({
+        email: "",
+      });
+    }
   };
   return (
     <RegisterLayout>
