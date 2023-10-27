@@ -6,11 +6,13 @@ import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux'
 import Store from './Redux/Store.js'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
  <Provider store={Store} >
  <BrowserRouter>
     <App />
-    <Toaster/>
+    <ToastContainer/>
   </BrowserRouter>
   </Provider>
 )

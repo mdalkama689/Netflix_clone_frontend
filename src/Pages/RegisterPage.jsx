@@ -5,11 +5,12 @@ import { useDispatch } from "react-redux";
 import { isValidPaswword } from "../Helpers/regexMatcher";
 import toast from "react-hot-toast";
 import { registerAccount } from "../Redux/slice/authSlice";
+
 const RegisterPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userEmail } = location.state|| '';
+  const { userEmail } = location.state || "";
   const [userDetails, setUserDetails] = useState({
     email: userEmail,
     username: "",
@@ -28,13 +29,12 @@ const RegisterPage = () => {
       toast.error("Please enter a strong password");
     }
     const response = await dispatch(registerAccount(userDetails));
-    console.log(response);
-    if (response?.data?.success) {
+    if (response?.payload?.success) {
       navigate("/");
     }
   };
   return (
-    <RegisterLayout showContent={false}>
+    <RegisterLayout >
       <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black p-12 rounded-2xl">
         <h1 className="text-white text-2xl text-center font-medium tracking-widest">
           Create your new account
@@ -68,7 +68,7 @@ const RegisterPage = () => {
           <label htmlFor="password"></label>
           <input
             className=" bg-black text-white border border-white rounded-md py-4 pl-4 pr-2 w-96 outline-none"
-            type='text'
+            type="text"
             name="password"
             id="password"
             placeholder="Enter your password"

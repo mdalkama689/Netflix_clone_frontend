@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { signInAccount } from "../Redux/slice/authSlice";
+
 const SignIn = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,15 +26,15 @@ const SignIn = () => {
       toast.error("All fiels are required");
     }
     const response = await dispatch(signInAccount(userDetails));
-    if (response) {
+    if (response?.payload?.success) {
       navigate("/");
     }
   };
   return (
-    <RegisterLayout showContent={false}>
+    <RegisterLayout >
       <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black p-12 rounded-2xl">
         <h1 className="text-white text-2xl text-center font-medium tracking-widest">
-          Login your account
+   Login to your account.
         </h1>
         <form
           noValidate

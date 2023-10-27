@@ -25,14 +25,15 @@ const VerifyOtpPage = () => {
   const handleSubmitButton = async (e) => {
     e.preventDefault();
     if (!userOtp.otp) {
-      toast.error("Please enter your otp");
+      return toast.error("Please enter your otp");
     }
     const response = await dispatch(verifyOtp(userOtp));
     if (response?.payload?.success) {
       const userEmail = response.meta.arg.email;
       navigate("/register", {
         state: {
-          userEmail}
+          userEmail,
+        },
       });
       setUserOtp({
         email: "",

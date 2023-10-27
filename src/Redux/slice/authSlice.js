@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../Helpers/axiosInstance";
-import { toast } from "react-hot-toast";
-import { json } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
+let loadingToast;
 const storedIsLoggedIn = localStorage.getItem("isloggedIn") || false;
 const storedRole = localStorage.getItem("role") || "";
 const storedData = localStorage.getItem("data") || "";
@@ -17,35 +18,37 @@ const initialState = {
 
 export const sendOtp = createAsyncThunk("auth/sendOtp", async (data) => {
   try {
-    const response = axiosInstance.post("/auth/send/otp", data);
-
-    toast.promise(response, {
-      loading: "Sending OTP. Please wait...",
-      success: (data) => {
-        return data?.data?.message;
-      },
-      error: "Failed to sent Otp",
-    });
-    return (await response).data;
+    const response = await axiosInstance.post("/auth/send/otp", data);
+    // Display loading toast
+    loadingToast = toast.error("Sending OTP. Please wait...");
+    // Extract the necessary data from the response
+    const responseData = response.data;
+    // Display success toast
+    toast.success(responseData.message, { autoClose: 2000 });
+    if (toast.success) {
+      toast.dismiss(loadingToast);
+    }
+    return responseData;
   } catch (error) {
-    toast.error(error?.response?.data?.message);
+    const errorMessage = error.response?.data?.message;
+    toast.error(errorMessage);
   }
 });
 
 export const verifyOtp = createAsyncThunk("auth/verifyOtp", async (data) => {
   try {
-    const response = axiosInstance.post("/auth/verify/otp", data);
-    toast.promise(response, {
-      loading: "Verifying OTP...",
-      success: (data) => {
-        return data?.data?.message;
-      },
-      error: "Please enter correct otp",
-    });
-
-    return (await response).data;
+    const response = await axiosInstance.post("/auth/verify/otp", data);
+    loadingToast = toast.error("Verifying OTP. Please wait...");
+    const responseData = response.data;
+    toast.success(responseData.message, { autoClose: 2000 });
+    if (toast.success) {
+      toast.dismiss(loadingToast);
+    }
+    return responseData;
   } catch (error) {
-    toast.error(error?.response?.data?.message);
+    const errorMessage = error.response?.data?.message;
+    toast.error(errorMessage);
+    return { error: errorMessage };
   }
 });
 
@@ -53,51 +56,55 @@ export const registerAccount = createAsyncThunk(
   "auth/register",
   async (data) => {
     try {
-      const response = axiosInstance.post("/auth/register", data);
-      toast.promise(response, {
-        loading: "Please wait while we create your account...",
-        success: (data) => {
-          return data?.data?.message;
-        },
-        error: "Failed to create your account. Please try again later",
-      });
-      return (await response).data;
+      const response = await axiosInstance.post("/auth/register", data);
+      loadingToast = toast.error("Please wait, your account is being created.");
+      const responseData = response.data;
+      toast.success(responseData.message, { autoClose: 2000 });
+      if (toast.success) {
+        toast.dismiss(loadingToast);
+      }
+      return responseData;
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      const errorMessage = error.response?.data?.message;
+      toast.error(errorMessage);
+      return { error: errorMessage };
     }
   }
 );
-export const signInAccount = createAsyncThunk('auth/singin', async(data) => {
+export const signInAccount = createAsyncThunk("auth/singin", async (data) => {
   try {
-    const response = axiosInstance.post('/auth/login', data)
-    toast.promise(response, {
-      loading: 'Logging in... Please wait.',
-      success: (data) => {
-        return data?.data?.message
-      },
-      error: 'Login failed. Please check your credentials and try again.'
-    })
-    return (await response)
+    const response = await axiosInstance.post("/auth/login", data);
+    loadingToast = toast.error("Signing in. Please wait..");
+    const responseData = response.data;
+    toast.success(responseData.message, { autoClose: 2000 });
+    if (toast.success) {
+      toast.dismiss(loadingToast);
+    }
+    return responseData;
   } catch (error) {
-    toast.error(error?.response?.data?.message)
+    const errorMessage = error.response?.data?.message;
+    toast.error(errorMessage);
+    return { error: errorMessage };
   }
-})
+});
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
+  reducers: {},extraReducers: (builder) => {
     builder.addCase(signInAccount.fulfilled, (state, action) => {
-      console.log(`action : ${action}`);
-      localStorage.setItem("data", JSON.stringify(action?.payload?.user));
-      localStorage.setItem("isloggedIn", true);
-      localStorage.setItem("role", action?.payload?.user?.isAdmin);
-      state.isLoggedIn = true;
-      state.role = action?.payload?.user?.isAdmin;
-      state.data = action?.payload?.user;
+      if (action.payload) {
+        localStorage.setItem("data", JSON.stringify(action.payload.userExists));
+        localStorage.setItem("isLoggedIn", true); // Corrected key
+        const role = action.payload.userExists.isAdmin ? "Admin" : "User";
+        localStorage.setItem("role", role);
+        state.isLoggedIn = true;
+        state.role = action.payload.userExists.isAdmin;
+        state.data = action.payload.userExists;
+      }
     });
-  },
+  }
+  
 });
 
 export default authSlice.reducer;

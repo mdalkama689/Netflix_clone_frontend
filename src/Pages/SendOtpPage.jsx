@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import netflixBackgroundImg from "../assets/netflix_background_img.jpg";
 import { IoChevronForwardOutline } from "react-icons/io5";
-import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { isEmailValid } from "../Helpers/regexMatcher";
 import { sendOtp } from "../Redux/slice/authSlice";
 import RegisterLayout from "../Layouts/RegisterLayout";
@@ -24,10 +25,10 @@ const SendOtpPage = () => {
   const handleSubmitButton = async (e) => {
     e.preventDefault();
     if (!userData.email) {
-      toast.error("Please enter the email");
+        return toast.error("Please enter the email", {autoClose: 3000});
     }
     if (!isEmailValid(userData.email)) {
-      toast.error("Please error correct email");
+     return toast.error("Please error correct email", {autoClose: 3000});
     }
 
     const response = await dispatch(sendOtp(userData));
